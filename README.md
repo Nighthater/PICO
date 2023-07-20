@@ -23,4 +23,4 @@
 |Replaceable Battery|Yes|
 
 
-[Device.png]
+![](Device.png)
