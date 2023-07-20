@@ -16,10 +16,10 @@
 |Total LEDs|32|
 |LED Type|WS2812B|
 |LED Power|8,3W|
-|Battery Size|13000mAh|
-|Runtime|6h|
+|Battery Size|10400mAh|
+|Runtime|4h30min|
 |Battery Type|4x18650 Cells|
-|Recharge Time|10h|
+|Recharge Time|11h|
 |Replaceable Battery|Yes|
 
 
