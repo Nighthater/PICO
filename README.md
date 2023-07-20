@@ -21,3 +21,6 @@
 |Battery Type|4x18650 Cells|
 |Recharge Time|10h|
 |Replaceable Battery|Yes|
+
+
+[Device.png]
