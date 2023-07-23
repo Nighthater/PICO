@@ -15,13 +15,12 @@
 |Dimensions|16cm x 12.5cm x 6cm|
 |Mounting Options|1x 1/4" UNC Thread|
 |Total LEDs|32|
-|LED Type|WS2812B|
-|LED Power|8,3W|
+|LED Type|WS2812B-B/W|
+|Peak LED Power|6W|
 |Battery Size|10400mAh|
-|Runtime|4h30min at Max Brightness|
+|Runtime|4h30min at Max Brightness (White), ~18h at 100% Saturated Colors|
 |Battery Type|4x18650 Cells|
 |Recharge Time|11h|
-|Replaceable Battery|Yes|
 
 
 ![](Device.png)
