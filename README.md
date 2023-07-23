@@ -17,8 +17,8 @@
 |Total LEDs|32|
 |LED Type|WS2812B-B/W|
 |Peak LED Power|6W|
-|Battery Size|10400mAh|
-|Runtime|4h30min at Max Brightness (White), ~18h at 100% Saturated Colors|
+|Battery Size|12800mAh|
+|Runtime|8h at Max Brightness (White), ~20h at 100% Saturated Colors|
 |Battery Type|4x18650 Cells|
 |Recharge Time|11h|
 
