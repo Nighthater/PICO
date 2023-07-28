@@ -16,11 +16,11 @@
 |Mounting Options|1x 1/4" UNC Thread|
 |Total LEDs|32|
 |LED Type|WS2812B-B/W|
-|LED Power|Maximum: 6W, 2.5W on Average|
+|LED Power|Maximum: 7.5W, 2.5W on Average|
 |Battery Size|12800mAh|
 |Runtime|8h at Max Brightness (White), ~20h at 100% Saturated Colors|
 |Battery Type|4x18650 Cells|
-|Recharge Time|11h|
+|Recharge Time|5h|
 
 
 ![](Device.png)
