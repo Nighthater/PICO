@@ -20,6 +20,7 @@
 |Battery Size|12800mAh|
 |Runtime|6h at Max Brightness (White), ~20h at 100% Saturated Colors|
 |Battery Type|4x18650 Cells|
+|Port|USB Type-C 10W|
 |Recharge Time|5h|
 
 
