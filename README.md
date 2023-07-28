@@ -18,7 +18,7 @@
 |LED Type|WS2812B-B/W|
 |LED Power|Maximum: 7.5W, 2.5W on Average|
 |Battery Size|12800mAh|
-|Runtime|8h at Max Brightness (White), ~20h at 100% Saturated Colors|
+|Runtime|6h at Max Brightness (White), ~20h at 100% Saturated Colors|
 |Battery Type|4x18650 Cells|
 |Recharge Time|5h|
 
