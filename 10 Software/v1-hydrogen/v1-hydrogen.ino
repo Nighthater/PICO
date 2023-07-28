@@ -78,8 +78,9 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 float h, s, v;
 int   r, g, b;
+int   r_old, g_old, b_old;
 
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ400);
 
 #define DELAYVAL 500 // Time (in milliseconds) to pause between pixels
 
@@ -91,7 +92,7 @@ void setup() {
   pinMode(DPAD_RIGHT, INPUT_PULLUP);
   pinMode(SIDE_MENU, INPUT_PULLUP);
   pinMode(SIDE_PAUSE, INPUT_PULLUP);
-  
+  Serial.begin(9600);
   // Initialize Display
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -117,13 +118,15 @@ void loop() {
   //TODO
   
   // Wait for BTN Input
-  if(digitalRead(DPAD_UP) == LOW)    { h = h + 1/360; }
-  if(digitalRead(DPAD_DOWN) == LOW)  { h = h - 1/360; }
-  if(digitalRead(DPAD_LEFT) == LOW)  { s = s - 1/100; }
-  if(digitalRead(DPAD_RIGHT) == LOW) { s = s + 1/100; }
-  if(digitalRead(SIDE_MENU) == LOW)  { v = v + 1/100; }
-  if(digitalRead(SIDE_PAUSE) == LOW) { v = v - 1/100; }
-
+  if(digitalRead(DPAD_UP) == LOW)    { h = h + 1.0/360.0; Serial.println("UP");delay(10);}
+  if(digitalRead(DPAD_DOWN) == LOW)  { h = h - 1.0/360.0; Serial.println("DN");delay(10);}
+  if(digitalRead(DPAD_LEFT) == LOW)  { s = s - 1.0/100.0; Serial.println("LT");delay(10);}
+  if(digitalRead(DPAD_RIGHT) == LOW) { s = s + 1.0/100.0; Serial.println("RT");delay(10);}
+  if(digitalRead(SIDE_MENU) == LOW)  { v = v + 1.0/100.0; Serial.println("MN");delay(10);}
+  if(digitalRead(SIDE_PAUSE) == LOW) { v = v - 1.0/100.0; Serial.println("PS");delay(10);}
+  Serial.print(h);
+  Serial.print(s);
+  Serial.println(v);
   // Boundaries
   if(h>1.0){h=0.0;}
   if(h<0.0){h=1.0;}
@@ -132,16 +135,73 @@ void loop() {
   if(v>1.0){v=1.0;}
   if(v<0.0){v=0.0;}
   
-  
+  Serial.print(h);
+  Serial.print(s);
+  Serial.println(v);
   // CONVERT TO RGB
-  hsvToRgb(h,s,v,r,g,b);
+
+  r_old = r;
+  g_old = g;
+  b_old = b;
+  hsvToRgb(h, s, v, r, g, b);
   // UPDATE LEDS
-  
-  for(int i = 0; i<NUMPIXELS; i++)
+
+  if(r_old == r and g_old == g and b_old == b)
   {
-    pixels.setPixelColor(i, pixels.Color(r, g, b));
+    delay(1);
   }
-  pixels.show();
+  else
+  {
+    for(int i = 0; i<NUMPIXELS; i++)
+      {
+        pixels.setPixelColor(i, pixels.Color(r, g, b));
+      }
+      
+    pixels.show();  
+  }
+  // Display 
+  display.clearDisplay();
+  display.drawFastHLine(0,15,128,WHITE);
+  //Top font
+  display.setCursor(38,4);
+  display.setTextColor(WHITE);
+  display.print("virtunaut");
+
+  display.setCursor(11,25);
+  display.print("H:");
+  display.print(int(h*360));
+  display.print("deg");
+
+  display.setCursor(11,35);
+  display.print("S:");
+  display.print(int(s*100));
+  display.print("%");
+
+  display.setCursor(11,45);
+  display.print("V:");
+  display.print(int(v*100));
+  display.print("%");
+
+  display.setCursor(78,25);
+  display.print("R:");
+  display.print(r);
+
+  display.setCursor(78,35);
+  display.print("G:");
+  display.print(g);
+
+  display.setCursor(78,45);
+  display.print("B:");
+  display.print(b);
+  
+
+  display.display();
+  delay(10);
+  
+  
+  
+  
+  
 }
 
 void hsvToRgb(float h, float s, float v, int& r, int& g, int& b) {
@@ -180,4 +240,8 @@ void hsvToRgb(float h, float s, float v, int& r, int& g, int& b) {
   r = (r1 + m) * 255;
   g = (g1 + m) * 255;
   b = (b1 + m) * 255;
+  Serial.print("Lmao: ");
+  Serial.print(r);
+  Serial.print(g);
+  Serial.println(b);
 }
