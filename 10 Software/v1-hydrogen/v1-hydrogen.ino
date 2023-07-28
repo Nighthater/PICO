@@ -58,12 +58,12 @@ SOFTWARE.
 //█▄▀ ██▄ █▄▄ █▄▄ █▀█ █▀▄ █▀█ ░█░ █ █▄█ █░▀█ ▄█
 
 //Pins
-int DPAD_UP     = 2;
-int DPAD_DOWN   = 3;
-int DPAD_LEFT   = 5;
-int DPAD_RIGHT  = 4;
-int SIDE_MENU   = 6;
-int SIDE_PAUSE  = 7;
+int DPAD_UP     = 7;
+int DPAD_DOWN   = 6;
+int DPAD_LEFT   = 4;
+int DPAD_RIGHT  = 5;
+int SIDE_MENU   = 3;
+int SIDE_PAUSE  = 15;
 
 //OLED
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
