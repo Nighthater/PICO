@@ -152,7 +152,7 @@ void dispDrawMainMenu()
   display.display();
 }
 
-void dispDrawSubMenu(String subMenuItem)
+void dispDrawSubMenuRGB(String subMenuItem)
 {
   display.clearDisplay();
   // Draw Stuff
@@ -170,6 +170,27 @@ void dispDrawSubMenu(String subMenuItem)
   display.setCursor(50,45);
   display.print("b: ");
   display.print(b);
+  display.display();
+}
+
+void dispDrawSubMenuHSV(String subMenuItem)
+{
+  display.clearDisplay();
+  // Draw Stuff
+  // Print "MainMenu" at the Top
+  // Center Cursor
+  display.setCursor(11,25);
+  // Print menuItem
+  display.print(subMenuItem);
+  display.setCursor(50,25);
+  display.print("h: ");
+  display.print(int(h*360));
+  display.setCursor(50,35);
+  display.print("s: ");
+  display.print(int(s*100));
+  display.setCursor(50,45);
+  display.print("v: ");
+  display.print(int(v*100));
   display.display();
 }
 
@@ -191,12 +212,8 @@ void PROG_MAINMENU()
       mainMenuSelected = mainMenuSelected - 1;
     } 
 	
-    if (mainMenuSelected >= mainMenuItems) {
-      mainMenuSelected = 0;
-    }
-    if (mainMenuSelected < 0) {
-      mainMenuSelected = mainMenuItems - 1;
-    }
+	if(mainMenuSelected >= mainMenuItems) {mainMenuSelected = 0;}
+	if(mainMenuSelected <= -1) {mainMenuSelected = mainMenuItems-1;}
     
     if(digitalRead(DPAD_RIGHT) == LOW) // Enters Next Menu
     { 
@@ -268,7 +285,7 @@ void PROG_RGBMENU()
         pixels.setPixelColor(i, pixels.Color(r, g, b));
       }  
       pixels.show();
-	  } 
+	} 
 
     if(digitalRead(DPAD_UP) == LOW) // Scroll UP
     { 
@@ -286,11 +303,119 @@ void PROG_RGBMENU()
     
     if(digitalRead(SIDE_MENU) == LOW)  { break; } // Quit to previous
     
-    dispDrawSubMenu(RGBMenu[RGBMenuSelected]);
+    dispDrawSubMenuRGB(RGBMenu[RGBMenuSelected]);
   }
 }
 
 void PROG_HSVMENU()
 {
-  //dispDrawSubMenu();
+  while(true)
+  {
+    if(digitalRead(DPAD_LEFT) == LOW) // Decrease selected Variable
+    { 
+      delay(25);
+
+      switch (HSVMenuSelected)
+      {
+        case 0: {h = h - 1.0/360.0; break;}
+        case 1: {s = s - 0.01; break;}
+        case 2: {v = v - 0.01; break;}
+      }
+      // Error Check
+      if(h<0.0){h=0.0;}
+      if(s<0.0){s=0.0;}
+      if(v<0.0){v=0.0;}
+	  
+	  hsvToRgb(h,s,v,r,g,b);
+
+      for(int i = 0; i<NUMPIXELS; i++)
+      {
+        pixels.setPixelColor(i, pixels.Color(r, g, b));
+      }  
+      pixels.show();
+    } 
+	
+	if(digitalRead(DPAD_RIGHT) == LOW) // Increase selected Variable
+    { 
+      delay(25);
+
+    
+      switch (HSVMenuSelected)
+      {
+        case 0: {h = h + 1.0/360.0; break;}
+        case 1: {s = s + 0.01; break;}
+        case 2: {v = v + 0.01; break;}
+      }
+      // Error Check
+
+      if(h>1.0){h=1.0;}
+      if(s>1.0){s=1.0;}
+      if(v>1.0){v=1.0;}
+	  
+	  hsvToRgb(h,s,v,r,g,b);
+
+      for(int i = 0; i<NUMPIXELS; i++)
+      {
+        pixels.setPixelColor(i, pixels.Color(r, g, b));
+      }  
+      pixels.show();
+	} 
+	
+	if(digitalRead(DPAD_UP) == LOW) // Scroll UP
+    { 
+      delay(200);
+      if(HSVMenuSelected >= HSVMenuItems - 1) {HSVMenuSelected = 0;}
+      else {HSVMenuSelected = HSVMenuSelected + 1;}
+    } 
+	
+	if(digitalRead(DPAD_DOWN) == LOW)  // Scroll DOWN
+    { 
+      delay(200);
+      if(HSVMenuSelected < 0) {HSVMenuSelected = HSVMenuItems - 1;}
+      else {HSVMenuSelected = HSVMenuSelected - 1;}
+    }
+	
+	if(digitalRead(SIDE_MENU) == LOW)  { break; } // Quit to previous
+	
+	dispDrawSubMenuHSV(HSVMenu[HSVMenuSelected]);
+  }
+}
+
+
+void hsvToRgb(float h, float s, float v, int& r, int& g, int& b) {
+  float c = v * s;
+  float x = c * (1 - abs(fmod((h * 6), 2) - 1));
+  float m = v - c;
+
+  float r1, g1, b1;
+
+  if (h >= 0 && h < 1/6.0) {
+    r1 = c;
+    g1 = x;
+    b1 = 0;
+  } else if (h >= 1/6.0 && h < 2/6.0) {
+    r1 = x;
+    g1 = c;
+    b1 = 0;
+  } else if (h >= 2/6.0 && h < 3/6.0) {
+    r1 = 0;
+    g1 = c;
+    b1 = x;
+  } else if (h >= 3/6.0 && h < 4/6.0) {
+    r1 = 0;
+    g1 = x;
+    b1 = c;
+  } else if (h >= 4/6.0 && h < 5/6.0) {
+    r1 = x;
+    g1 = 0;
+    b1 = c;
+  } else {
+    r1 = c;
+    g1 = 0;
+    b1 = x;
+  }
+
+  r = (r1 + m) * 255;
+  g = (g1 + m) * 255;
+  b = (b1 + m) * 255;
 }
