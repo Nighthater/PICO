@@ -8,7 +8,8 @@
 Helium Core
 
 - Software to control the PICO RGB Light with an GUI
-- Colors can only be selected using HSV Colors
+- Colors can only be selected using HSV and RGB Colors
+- Color Cycle
 - There are no further advanced features currently in use
 
 MIT License
@@ -83,10 +84,11 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ400);
 // MENU
 
 int mainMenuSelected = 0;
-const int mainMenuItems = 2;
+const int mainMenuItems = 3;
 String mainMenu[mainMenuItems] = {
   "RGB",
-  "HSV"
+  "HSV",
+  "ColorCycle"
 };
 
 int RGBMenuSelected = 0;
@@ -103,6 +105,13 @@ String HSVMenu[HSVMenuItems] = {
   "H",
   "S",
   "V"
+};
+
+int ColorCycleMenuSelected = 0;
+const int ColorCycleMenuItems = 2;
+String ColorCycleMenu[ColorCycleMenuItems] = {
+  "Speed",
+  "Luminosity",
 };
 
 
@@ -136,65 +145,12 @@ void loop() {
   
 }
 
-
-void dispDrawMainMenu()
-{
-  display.clearDisplay();
-  display.setTextColor(WHITE);
-  // Draw Stuff
-  // Print "MainMenu" at the Top
-  // Center Cursor
-  display.drawFastHLine(0,15,128,WHITE);
-  display.setCursor(11,25);
-  // Print menuItem
-  display.print(mainMenu[mainMenuSelected]);
-  display.display();
-}
-
-void dispDrawSubMenuRGB(String subMenuItem)
-{
-  display.clearDisplay();
-  // Draw Stuff
-  // Print "MainMenu" at the Top
-  // Center Cursor
-  display.setCursor(11,25);
-  // Print menuItem
-  display.print(subMenuItem);
-  display.setCursor(50,25);
-  display.print("r: ");
-  display.print(r);
-  display.setCursor(50,35);
-  display.print("g: ");
-  display.print(g);
-  display.setCursor(50,45);
-  display.print("b: ");
-  display.print(b);
-  display.display();
-}
-
-void dispDrawSubMenuHSV(String subMenuItem)
-{
-  display.clearDisplay();
-  // Draw Stuff
-  // Print "MainMenu" at the Top
-  // Center Cursor
-  display.setCursor(11,25);
-  // Print menuItem
-  display.print(subMenuItem);
-  display.setCursor(50,25);
-  display.print("h: ");
-  display.print(int(h*360));
-  display.setCursor(50,35);
-  display.print("s: ");
-  display.print(int(s*100));
-  display.setCursor(50,45);
-  display.print("v: ");
-  display.print(int(v*100));
-  display.display();
-}
+//-------------------------------------------------------------------------------------------
+// PROGRAMMING LOGIC
 
 void PROG_MAINMENU()
 {
+  
   while(true)
   {
     if(digitalRead(DPAD_UP) == LOW) // Scroll UP
@@ -219,14 +175,17 @@ void PROG_MAINMENU()
       delay(10);
       switch (mainMenuSelected)
       {
-        case 0: PROG_RGBMENU();
-        case 1: PROG_HSVMENU();
+        case 0: PROG_RGBMENU(); break;
+        case 1: PROG_HSVMENU(); break;
+		    case 2: PROG_COLORCYCLE(); break;
       }
       
     } 
     
+	if(digitalRead(SIDE_MENU) == LOW)  { mainMenuSelected = 0; delay(200);} // Resets back to normal Menu
+	
     //if(digitalRead(DPAD_LEFT) == LOW)  { delay(10);} // Does nothing, is already in main menu
-    //if(digitalRead(SIDE_MENU) == LOW)  { delay(10);} // Does nothing, is already in main menu
+    
     //if(digitalRead(SIDE_PAUSE) == LOW) { delay(10);} // Does nothing, nothing to pause
     
     
@@ -284,21 +243,24 @@ void PROG_RGBMENU()
         pixels.setPixelColor(i, pixels.Color(r, g, b));
       }  
       pixels.show();
-	} 
-
+	  } 
+    
     if(digitalRead(DPAD_UP) == LOW) // Scroll UP
     { 
       delay(200);
-      if(RGBMenuSelected >= RGBMenuItems - 1) {RGBMenuSelected = 0;}
-      else {RGBMenuSelected = RGBMenuSelected + 1;}
+      
+      RGBMenuSelected = RGBMenuSelected + 1;
     } 
     
     if(digitalRead(DPAD_DOWN) == LOW)  // Scroll DOWN
     { 
       delay(200);
-      if(RGBMenuSelected < 0) {RGBMenuSelected = RGBMenuItems - 1;}
-      else {RGBMenuSelected = RGBMenuSelected - 1;}
+      
+      RGBMenuSelected = RGBMenuSelected - 1;
     } 
+  
+  if(RGBMenuSelected >= RGBMenuItems) {RGBMenuSelected = 0;}
+  if(RGBMenuSelected <= -1) {RGBMenuSelected = RGBMenuItems-1;}
     
     if(digitalRead(SIDE_MENU) == LOW)  { break; } // Quit to previous
     
@@ -360,24 +322,185 @@ void PROG_HSVMENU()
       pixels.show();
 	} 
 	
-	if(digitalRead(DPAD_UP) == LOW) // Scroll UP
+
+    if(digitalRead(DPAD_UP) == LOW) // Scroll UP
     { 
       delay(200);
-      if(HSVMenuSelected >= HSVMenuItems - 1) {HSVMenuSelected = 0;}
-      else {HSVMenuSelected = HSVMenuSelected + 1;}
+      
+      HSVMenuSelected = HSVMenuSelected + 1;
     } 
-	
-	if(digitalRead(DPAD_DOWN) == LOW)  // Scroll DOWN
+    
+    if(digitalRead(DPAD_DOWN) == LOW)  // Scroll DOWN
     { 
       delay(200);
-      if(HSVMenuSelected < 0) {HSVMenuSelected = HSVMenuItems - 1;}
-      else {HSVMenuSelected = HSVMenuSelected - 1;}
-    }
+      
+      HSVMenuSelected = HSVMenuSelected - 1;
+    } 
+  
+  if(HSVMenuSelected >= HSVMenuItems) {HSVMenuSelected = 0;}
+  if(HSVMenuSelected <= -1) {HSVMenuSelected = HSVMenuItems-1;}
 	
 	if(digitalRead(SIDE_MENU) == LOW)  { break; } // Quit to previous
 	
 	dispDrawSubMenuHSV(HSVMenu[HSVMenuSelected]);
   }
+}
+
+void PROG_COLORCYCLE()
+{
+  int velocity = 10;
+  float luminosity = 0.1;
+  
+  while(true)
+  {
+    if(digitalRead(DPAD_LEFT) == LOW) // Decrease selected Variable
+    { 
+      delay(25);
+
+      switch (ColorCycleMenuSelected)
+      {
+        case 0: {velocity = velocity - 1; break;}
+        case 1: {luminosity = luminosity - 0.01; break;}
+      }
+      // Error Check
+      if(velocity < 0){velocity = 0;}
+      if(luminosity<0.0){luminosity=0.0;}
+    } 
+	
+	if(digitalRead(DPAD_RIGHT) == LOW) // Increase selected Variable
+    { 
+      delay(25);
+
+      switch (ColorCycleMenuSelected)
+      {
+        case 0: {velocity = velocity + 1; break;}
+        case 1: {luminosity = luminosity + 0.01; break;}
+      }
+      // Error Check
+      if(velocity > 100){velocity = 100;}
+      if(luminosity>1.0){luminosity=1.0;}
+    } 
+	
+	if(digitalRead(DPAD_UP) == LOW) // Scroll UP
+    { 
+      delay(200);
+      
+      ColorCycleMenuSelected = ColorCycleMenuSelected + 1;
+    } 
+    
+    if(digitalRead(DPAD_DOWN) == LOW)  // Scroll DOWN
+    { 
+      delay(200);
+      
+      ColorCycleMenuSelected = ColorCycleMenuSelected - 1;
+    } 
+	
+	// Error Checking
+	if(ColorCycleMenuSelected >= ColorCycleMenuItems) {ColorCycleMenuSelected = 0;}
+	if(ColorCycleMenuSelected <= -1) {ColorCycleMenuSelected = ColorCycleMenuItems - 1;}
+	
+	h = h + 1.0/360.0*velocity;
+	s = 1.0;
+	v = luminosity;
+
+  if(h>1.0){h=0.0;}
+
+	// Colorcycle
+	hsvToRgb(h,s,v,r,g,b);
+
+    for(int i = 0; i<NUMPIXELS; i++)
+    {
+	  pixels.setPixelColor(i, pixels.Color(r, g, b));
+    }  
+    pixels.show();
+
+	if(digitalRead(SIDE_MENU) == LOW)  { break; delay(200);} // Quit to previous
+	
+	dispDrawSubMenuCOLORCYCLE(ColorCycleMenu[ColorCycleMenuSelected], velocity);
+	
+	
+	delay(20);
+  }
+}
+
+//-------------------------------------------------------------------------------------------
+// GRAPHICS DEPARTMENT
+
+void dispDrawMainMenu()
+{
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  // Draw Stuff
+  // Print "MainMenu" at the Top
+  // Center Cursor
+  display.drawFastHLine(0,15,128,WHITE);
+  display.setCursor(11,25);
+  // Print menuItem
+  display.print(mainMenu[mainMenuSelected]);
+  display.display();
+}
+
+void dispDrawSubMenuRGB(String subMenuItem)
+{
+  display.clearDisplay();
+  // Draw Stuff
+  // Print "MainMenu" at the Top
+  // Center Cursor
+  display.setCursor(11,25);
+  // Print menuItem
+  display.print(subMenuItem);
+  display.setCursor(50,25);
+  display.print("r: ");
+  display.print(r);
+  display.setCursor(50,35);
+  display.print("g: ");
+  display.print(g);
+  display.setCursor(50,45);
+  display.print("b: ");
+  display.print(b);
+  display.display();
+}
+
+void dispDrawSubMenuHSV(String subMenuItem)
+{
+  display.clearDisplay();
+  // Draw Stuff
+  // Print "MainMenu" at the Top
+  // Center Cursor
+  display.setCursor(11,25);
+  // Print menuItem
+  display.print(subMenuItem);
+  display.setCursor(50,25);
+  display.print("h: ");
+  display.print(int(h*360));
+  display.setCursor(50,35);
+  display.print("s: ");
+  display.print(int(s*100));
+  display.setCursor(50,45);
+  display.print("v: ");
+  display.print(int(v*100));
+  display.display();
+}
+
+void dispDrawSubMenuCOLORCYCLE(String subMenuItem, int velocity)
+{
+  display.clearDisplay();
+  // Draw Stuff
+  // Print "MainMenu" at the Top
+  // Center Cursor
+  display.setCursor(11,25);
+  // Print menuItem
+  display.print(subMenuItem);
+  display.setCursor(50,25);
+  display.print("speed: ");
+  display.print(velocity);
+  display.setCursor(50,35);
+  display.print("lum.: ");
+  display.print(int(v*100));
+  display.setCursor(50,45);
+  display.print("hue: ");
+  display.print(int(h*360));
+  display.display();
 }
 
 
