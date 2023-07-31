@@ -8,19 +8,15 @@
 
 Beryllium Core
 
-- Software to control the PICO RGB Light with an GUI
-- Colors can only be selected using HSV and RGB Colors
-- Color Cycle
-
 PLANNED:
-- FX Police (US)
-- FX Police (DE)
 - Disco FX
 - Photo FX 
-- Fire FX
-- 
 
 COMPLETED:
+- Color Cycle
+- FX Police (US)
+- FX Police (DE)
+- Fire FX
 
 MIT License
 
@@ -94,11 +90,16 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ400);
 // MENU
 
 int mainMenuSelected = 0;
-const int mainMenuItems = 3;
+const int mainMenuItems = 8;
 String mainMenu[mainMenuItems] = {
   "RGB",
   "HSV",
-  "ColorCycle"
+  "ColorCycle",
+  "Police FX DE",
+  "Police FX US",
+  "Disco FX",
+  "Photo FX ",
+  "Fire FX"
 };
 
 int RGBMenuSelected = 0;
@@ -120,8 +121,8 @@ String HSVMenu[HSVMenuItems] = {
 int ColorCycleMenuSelected = 0;
 const int ColorCycleMenuItems = 2;
 String ColorCycleMenu[ColorCycleMenuItems] = {
-  "Speed",
-  "Luminosity",
+  "Velocity",
+  "Value",
 };
 
 
@@ -147,6 +148,19 @@ void setup() {
   // Initialize Neopixels
   pixels.begin();
   pixels.clear();
+
+  int coord = 64;
+  for(int i=coord; i>32; i--)
+  {
+    dispDrawLogoStart(i);
+    delay(1);
+  }
+
+  dispDrawLogoEnd(32);
+  delay(1500);
+
+  
+  
 }
 
 void loop() {
@@ -187,7 +201,13 @@ void PROG_MAINMENU()
       {
         case 0: PROG_RGBMENU(); break;
         case 1: PROG_HSVMENU(); break;
-		    case 2: PROG_COLORCYCLE(); break;
+		case 2: PROG_COLORCYCLE(); break;
+		case 3: PROG_POLICE_DE(); break;
+		case 4: PROG_POLICE_US(); break;
+		case 5: PROG_DISCO(); break;
+		case 6: PROG_PHOTO(); break;
+		case 7: PROG_FIRE(); break;
+	
       }
       
     } 
@@ -272,7 +292,7 @@ void PROG_RGBMENU()
   if(RGBMenuSelected >= RGBMenuItems) {RGBMenuSelected = 0;}
   if(RGBMenuSelected <= -1) {RGBMenuSelected = RGBMenuItems-1;}
     
-    if(digitalRead(SIDE_MENU) == LOW)  { break; } // Quit to previous
+    if(digitalRead(SIDE_MENU) == LOW)  {  delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break;} // Quit to previous
     
     dispDrawSubMenuRGB(RGBMenu[RGBMenuSelected]);
   }
@@ -350,7 +370,7 @@ void PROG_HSVMENU()
   if(HSVMenuSelected >= HSVMenuItems) {HSVMenuSelected = 0;}
   if(HSVMenuSelected <= -1) {HSVMenuSelected = HSVMenuItems-1;}
 	
-	if(digitalRead(SIDE_MENU) == LOW)  { break; } // Quit to previous
+	if(digitalRead(SIDE_MENU) == LOW)  { delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; } // Quit to previous
 	
 	dispDrawSubMenuHSV(HSVMenu[HSVMenuSelected]);
   }
@@ -415,16 +435,16 @@ void PROG_COLORCYCLE()
 
   if(h>1.0){h=0.0;}
 
-	// Colorcycle
-	hsvToRgb(h,s,v,r,g,b);
+	  // Colorcycle
+	  hsvToRgb(h,s,v,r,g,b);
 
     for(int i = 0; i<NUMPIXELS; i++)
     {
-	  pixels.setPixelColor(i, pixels.Color(r, g, b));
+	    pixels.setPixelColor(i, pixels.Color(r, g, b));
     }  
     pixels.show();
 
-	if(digitalRead(SIDE_MENU) == LOW)  { break; delay(200);} // Quit to previous
+	if(digitalRead(SIDE_MENU) == LOW)  { delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; delay(50);} // Quit to previous
 	
 	dispDrawSubMenuCOLORCYCLE(ColorCycleMenu[ColorCycleMenuSelected], velocity);
 	
@@ -433,40 +453,341 @@ void PROG_COLORCYCLE()
   }
 }
 
+void PROG_POLICE_DE()
+{
+  unsigned long TimeSinceStart;
+  TimeSinceStart = millis();
+  while(true)
+  {
+    dispDrawSubMenuPOLICEDE();
+	
+	if(millis() - TimeSinceStart <= 50)
+	{
+    r = 0;
+    g = 0;
+    b = 255; 
+	}
+	
+	if(millis() - TimeSinceStart > 50 and millis() - TimeSinceStart <= 100)
+	{
+    r = 0;
+    g = 0;
+    b = 0;   
+	}
+	
+	if(millis() - TimeSinceStart > 100 and millis() - TimeSinceStart <= 150)
+	{
+	  r = 0;
+    g = 0;
+    b = 255;
+	}
+	
+	
+	if(millis() - TimeSinceStart > 150)
+	{
+	   r = 0;
+     g = 0;
+     b = 0;
+	}
+	
+	if(millis() - TimeSinceStart > 350){	TimeSinceStart = millis(); } // Start Again
+
+  delay(10);
+  
+  for(int i = 0; i<NUMPIXELS; i++)
+  {
+    pixels.setPixelColor(i, pixels.Color(r, g, b));
+  } 
+	pixels.show();
+	if(digitalRead(SIDE_MENU) == LOW)  { delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; delay(50); } // Quit to previous
+	
+  }
+}
+
+void PROG_POLICE_US()
+{
+  unsigned long TimeSinceStart;
+  TimeSinceStart = millis();
+  while(true)
+  {
+    dispDrawSubMenuPOLICEUS();
+  
+  if(millis() - TimeSinceStart <= 50) {    r = 0;    g = 0;    b = 255;   }// BLUE1
+  if(millis() - TimeSinceStart > 50  and millis() - TimeSinceStart <= 100)  {    r = 0;    g = 0;    b = 0;    }  // PAUSE 1
+  if(millis() - TimeSinceStart > 100 and millis() - TimeSinceStart <= 150)  {    r = 0;    g = 0;    b = 255;  }  // BLUE2
+  if(millis() - TimeSinceStart > 150 and millis() - TimeSinceStart <= 200)  {    r = 0;    g = 0;    b = 0;    }  // PAUSE 2
+  if(millis() - TimeSinceStart > 200 and millis() - TimeSinceStart <= 250)  {    r = 0;    g = 0;    b = 255;  }  // BLUE3
+  if(millis() - TimeSinceStart > 250 and millis() - TimeSinceStart <= 450)  {    r = 0;    g = 0;    b = 0;    }  // LONGPAUSE
+  if(millis() - TimeSinceStart > 450 and millis() - TimeSinceStart <= 500)  {    r = 255;    g = 0;    b = 0;  }  // RED1
+  if(millis() - TimeSinceStart > 500  and millis() - TimeSinceStart <= 550)  {    r = 0;    g = 0;    b = 0;    }  // PAUSE 1
+  if(millis() - TimeSinceStart > 550 and millis() - TimeSinceStart <= 600)  {    r = 255;    g = 0;    b = 0;  }  // RED2
+  if(millis() - TimeSinceStart > 600  and millis() - TimeSinceStart <= 650)  {    r = 0;    g = 0;    b = 0;    }  // PAUSE 2
+  if(millis() - TimeSinceStart > 650 and millis() - TimeSinceStart <= 700)  {    r = 255;    g = 0;    b = 0;  }  // RED3
+  
+  if(millis() - TimeSinceStart > 700)  {     r = 0;     g = 0;     b = 0;  } // Turn OFF FINAL
+  
+  if(millis() - TimeSinceStart > 900){  TimeSinceStart = millis(); } // Start Again
+
+  delay(10);
+  
+  for(int i = 0; i<NUMPIXELS; i++)
+  {
+    pixels.setPixelColor(i, pixels.Color(r, g, b));
+  } 
+  pixels.show();
+    if(digitalRead(SIDE_MENU) == LOW)  {delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; delay(50);} // Quit to previous
+  }
+}
+
+
+void PROG_DISCO()
+{
+  uint8_t LightLevelRED[NUMPIXELS];
+  uint8_t LightLevelBLU[NUMPIXELS];
+  uint8_t LightLevelGRN[NUMPIXELS];
+  int DELAY_TIME = 20;
+  int cooling = 10;
+
+  // Percentage for Lightflash event
+  int SPARKING = 30;
+  
+  while(true)
+  {
+    
+
+    // Step 1: Cool down every pixel a little uniformly
+    for (int i = 0; i < NUMPIXELS; i++) {
+      LightLevelRED[i] = max(0, LightLevelRED[i] - cooling);
+      LightLevelBLU[i] = max(0, LightLevelBLU[i] - cooling);
+      LightLevelGRN[i] = max(0, LightLevelGRN[i] - cooling);
+    }
+
+
+    // Step 2: Sparking - random number of pixels will get hotter
+    if (random(0, 100) < SPARKING)
+    {
+      int amount = random (0,NUMPIXELS);
+      int startPixel = random (0,31-amount);
+      int LightlevelRED = random (20,255);
+      int LightlevelBLU = random (20,255);
+      int LightlevelGRN = random (20,255);
+      
+      for (int i = startPixel; i < startPixel+amount; i++) {
+        {
+          LightLevelRED[i] = LightlevelRED;
+          LightLevelBLU[i] = LightlevelBLU;
+          LightLevelGRN[i] = LightlevelGRN;
+        }
+      }
+    }
+
+    // Step 3: Set pixel colors based on heat
+    for (int i = 0; i < NUMPIXELS; i++) {
+      pixels.setPixelColor(i, LightLevelRED[i], LightLevelGRN[i], LightLevelBLU[i]);
+    }
+    pixels.show();
+    delay(DELAY_TIME);
+
+    if(digitalRead(SIDE_MENU) == LOW)  {delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; delay(50);} // Quit to previous
+
+    dispDrawSubMenuDISCO();
+    
+  }
+}
+
+void PROG_PHOTO()
+{
+  uint8_t LightLevel[NUMPIXELS];
+  int DELAY_TIME = 20;
+  int cooling = 0;
+
+  // Percentage for Lightflash event
+  int SPARKING = 25;
+  
+  while(true)
+  {
+    
+
+    // Step 1: Cool down every pixel a little uniformly
+    cooling = random(5, 30);
+    for (int i = 0; i < NUMPIXELS; i++) {
+      LightLevel[i] = max(0, LightLevel[i] - cooling);
+    }
+
+
+    // Step 2: Sparking - random number of pixels will get hotter
+    if (random(0, 100) < SPARKING)
+    {
+      int amount = random (0,NUMPIXELS);
+      int startPixel = random (0,31-amount);
+      int Lightlevel = random (20,255);
+      
+      for (int i = startPixel; i < startPixel+amount; i++) {
+        {
+          LightLevel[i] = Lightlevel; // Yeah I know, its bad...
+        }
+      }
+    }
+
+    // Step 3: Set pixel colors based on heat
+    for (int i = 0; i < NUMPIXELS; i++) {
+      pixels.setPixelColor(i, LightLevel[i], LightLevel[i], LightLevel[i]);
+    }
+    pixels.show();
+    delay(DELAY_TIME);
+
+    if(digitalRead(SIDE_MENU) == LOW)  {delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; delay(50);} // Quit to previous
+
+    dispDrawSubMenuPHOTO();
+    
+  }
+}
+
+void PROG_FIRE()
+{
+  // Fire color palette (in RGB format)
+  const uint32_t FIRE_COLORS[] = {
+    Adafruit_NeoPixel::Color(255, 25, 0),   // 1000K
+    Adafruit_NeoPixel::Color(255, 60, 0),   // 1100K
+    Adafruit_NeoPixel::Color(255, 83, 0),   // 1200K
+    Adafruit_NeoPixel::Color(255, 93, 0),   // 1300K
+    Adafruit_NeoPixel::Color(255, 101, 0),  // 1400K
+    Adafruit_NeoPixel::Color(255, 109, 0),  // 1500K
+    Adafruit_NeoPixel::Color(255, 125, 0),  // 1600K
+    Adafruit_NeoPixel::Color(255, 131, 0),  // 1700K
+    Adafruit_NeoPixel::Color(255, 146, 0),  // 1800K
+    Adafruit_NeoPixel::Color(255, 161, 15),  // 1900K
+    Adafruit_NeoPixel::Color(255, 170, 30), // 2500K
+};
+  static uint8_t heat[NUMPIXELS];
+
+  int COOLING = 70;
+  int SPARKING = 5;
+  int DELAY_TIME = 20;
+  
+  while(true)
+  {
+    // Step 1: Cool down every pixel a little
+    for (int i = 0; i < NUMPIXELS; i++) {
+      heat[i] = max(0, heat[i] - random(5, 15));
+    }
+    // Step 2: Sparking - random pixel will get hotter
+    for (int i = 0; i < NUMPIXELS; i++) {
+      if (random(0, 100) < SPARKING) {
+        heat[i] = 255;
+      }
+    }
+
+    // Step 3: Set pixel colors based on heat
+    for (int i = 0; i < NUMPIXELS; i++) {
+      uint32_t color = FIRE_COLORS[heat[i] / 25];  // Map heat value to the color palette
+      pixels.setPixelColor(i, color);
+    }
+    pixels.show();
+    delay(DELAY_TIME);
+    if(digitalRead(SIDE_MENU) == LOW)  {delay(50); pixels.clear(); delay(50); pixels.show(); delay(50); break; delay(50);} // Quit to previous
+
+    dispDrawSubMenuFIRE();
+  }
+}
 //-------------------------------------------------------------------------------------------
 // GRAPHICS DEPARTMENT
+void dispDrawLogoStart(int coord)
+{
+  int heightOffset = 0;
+  display.clearDisplay();
+
+  display.fillRect(coord-22,39+heightOffset,24,24,WHITE);
+  display.fillRect(coord,17+heightOffset,24,24,WHITE);
+
+  display.fillRect(coord-18,43+heightOffset,16,16,BLACK);
+  display.fillRect(coord+4,21+heightOffset,16,16,BLACK);
+
+  display.fillRect(coord-14,47+heightOffset,8,8,WHITE);
+  display.fillRect(coord+8,25+heightOffset,8,8,WHITE);
+  
+  display.display();
+}
+
+void dispDrawLogoEnd(int coord)
+{
+  int heightOffset = 0;
+  display.clearDisplay();
+
+  display.fillRect(coord-22,39+heightOffset,24,24,WHITE);
+  display.fillRect(coord,17+heightOffset,24,24,WHITE);
+
+  display.fillRect(coord-18,43+heightOffset,16,16,BLACK);
+  display.fillRect(coord+4,21+heightOffset,16,16,BLACK);
+
+  display.fillRect(coord-14,47+heightOffset,8,8,WHITE);
+  display.fillRect(coord+8,25+heightOffset,8,8,WHITE);
+
+  display.setTextColor(WHITE);
+
+  
+  display.setCursor(64,35+heightOffset);
+  display.print("TINKERPAD");
+  display.display();
+}
+
+
 
 void dispDrawMainMenu()
 {
   display.clearDisplay();
   display.setTextColor(WHITE);
-  // Draw Stuff
+  
   // Print "MainMenu" at the Top
-  // Center Cursor
+  display.setCursor(11,4);
+  display.print("Main Menu - Pg. ");
+  display.print(mainMenuSelected+1);
+  
+  // Draw Stuff
   display.drawFastHLine(0,15,128,WHITE);
-  display.setCursor(11,25);
+  display.fillRoundRect(7,25,110,30,5,WHITE);
+  display.fillRoundRect(8,26,108,25,5,BLACK);
+  
   // Print menuItem
+  display.setCursor(25,35);
   display.print(mainMenu[mainMenuSelected]);
+  
+
+  
   display.display();
 }
 
 void dispDrawSubMenuRGB(String subMenuItem)
 {
   display.clearDisplay();
+  display.setTextColor(WHITE);
+
+  // Print "RGBMenu" at the Top
+  display.setCursor(11,4);
+  display.print("RGB Settings");
+
   // Draw Stuff
-  // Print "MainMenu" at the Top
-  // Center Cursor
-  display.setCursor(11,25);
-  // Print menuItem
+  display.drawFastHLine(0,15,128,WHITE);
+  display.fillRoundRect(76,20,52,44,5,WHITE);
+  display.fillRoundRect(77,21,50,38,5,BLACK);
+
+  display.fillRoundRect(10,29,30,20,5,WHITE);
+  display.fillRoundRect(11,30,28,16,5,BLACK);
+
+  display.setCursor(2,19);
+  display.print("Now editing:");
+
+  // Print menuItems
+  display.setCursor(22,35);
   display.print(subMenuItem);
-  display.setCursor(50,25);
-  display.print("r: ");
+  display.setCursor(80,25);
+  display.print("R: ");
   display.print(r);
-  display.setCursor(50,35);
-  display.print("g: ");
+  display.setCursor(80,35);
+  display.print("G: ");
   display.print(g);
-  display.setCursor(50,45);
-  display.print("b: ");
+  display.setCursor(80,45);
+  display.print("B: ");
   display.print(b);
   display.display();
 }
@@ -474,20 +795,34 @@ void dispDrawSubMenuRGB(String subMenuItem)
 void dispDrawSubMenuHSV(String subMenuItem)
 {
   display.clearDisplay();
+  display.setTextColor(WHITE);
+
+  // Print "HSVMenu" at the Top
+  display.setCursor(11,4);
+  display.print("HSV Settings");
+
   // Draw Stuff
-  // Print "MainMenu" at the Top
-  // Center Cursor
-  display.setCursor(11,25);
-  // Print menuItem
+  display.drawFastHLine(0,15,128,WHITE);
+  display.fillRoundRect(76,20,52,44,5,WHITE);
+  display.fillRoundRect(77,21,50,38,5,BLACK);
+
+  display.fillRoundRect(10,29,30,20,5,WHITE);
+  display.fillRoundRect(11,30,28,16,5,BLACK);
+
+  display.setCursor(2,19);
+  display.print("Now editing:");
+  
+  // Print menuItems
+  display.setCursor(23,35);
   display.print(subMenuItem);
-  display.setCursor(50,25);
-  display.print("h: ");
+  display.setCursor(80,25);
+  display.print("H: ");
   display.print(int(h*360));
-  display.setCursor(50,35);
-  display.print("s: ");
+  display.setCursor(80,35);
+  display.print("S: ");
   display.print(int(s*100));
-  display.setCursor(50,45);
-  display.print("v: ");
+  display.setCursor(80,45);
+  display.print("V: ");
   display.print(int(v*100));
   display.display();
 }
@@ -495,24 +830,125 @@ void dispDrawSubMenuHSV(String subMenuItem)
 void dispDrawSubMenuCOLORCYCLE(String subMenuItem, int velocity)
 {
   display.clearDisplay();
+
+  // Print "HSVMenu" at the Top
+  display.setCursor(11,4);
+  display.print("Cycle Settings");
+
   // Draw Stuff
-  // Print "MainMenu" at the Top
-  // Center Cursor
-  display.setCursor(11,25);
-  // Print menuItem
+  display.drawFastHLine(0,15,128,WHITE);
+  display.fillRoundRect(66,20,62,44,5,WHITE);
+  display.fillRoundRect(67,21,60,38,5,BLACK);
+
+  display.fillRoundRect(2,29,60,20,5,WHITE);
+  display.fillRoundRect(3,30,58,16,5,BLACK);
+
+  display.setCursor(2,19);
+  display.print("Editing:");
+    
+  // Print menuItems
+  display.setCursor(5,35);
   display.print(subMenuItem);
-  display.setCursor(50,25);
-  display.print("speed: ");
+  display.setCursor(70,25);
+  display.print("Vel.: ");
   display.print(velocity);
-  display.setCursor(50,35);
-  display.print("lum.: ");
+  display.setCursor(70,35);
+  display.print("Val.: ");
   display.print(int(v*100));
-  display.setCursor(50,45);
-  display.print("hue: ");
+  display.setCursor(70,45);
+  display.print("Hue: ");
   display.print(int(h*360));
   display.display();
 }
 
+void dispDrawSubMenuPOLICEDE()
+{
+  display.clearDisplay();
+
+  // Print "Menu" at the Top
+  display.setCursor(11,4);
+  display.print("Police DE");
+
+  display.setCursor(25,35);
+  display.print("No Settings");
+
+  // Draw Stuff
+  display.drawFastHLine(0,15,128,WHITE);
+  
+  display.display();
+}
+
+void dispDrawSubMenuPOLICEUS()
+{
+  display.clearDisplay();
+
+  // Print "Menu" at the Top
+  display.setCursor(11,4);
+  display.print("Police US");
+
+  display.setCursor(25,35);
+  display.print("No Settings");
+
+  // Draw Stuff
+  display.drawFastHLine(0,15,128,WHITE);
+
+
+  display.display();
+}
+
+void dispDrawSubMenuPHOTO()
+{
+  display.clearDisplay();
+
+  // Print "Menu" at the Top
+  display.setCursor(11,4);
+  display.print("Photo FX");
+
+  display.setCursor(25,35);
+  display.print("No Settings");
+
+  // Draw Stuff
+  display.drawFastHLine(0,15,128,WHITE);
+
+
+  display.display();
+}
+
+void dispDrawSubMenuDISCO()
+{
+  display.clearDisplay();
+
+  // Print "Menu" at the Top
+  display.setCursor(11,4);
+  display.print("Disco FX");
+
+  display.setCursor(25,35);
+  display.print("No Settings");
+
+  // Draw Stuff
+  display.drawFastHLine(0,15,128,WHITE);
+
+
+  display.display();
+}
+
+void dispDrawSubMenuFIRE()
+{
+  display.clearDisplay();
+
+  // Print "Menu" at the Top
+  display.setCursor(11,4);
+  display.print("Fire FX");
+
+  display.setCursor(25,35);
+  display.print("No Settings");
+
+  // Draw Stuff
+  display.drawFastHLine(0,15,128,WHITE);
+
+
+  display.display();
+}
 
 void hsvToRgb(float h, float s, float v, int& r, int& g, int& b) {
   float c = v * s;
